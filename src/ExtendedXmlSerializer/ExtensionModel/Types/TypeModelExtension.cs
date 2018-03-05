@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Types
 {
-	sealed class TypeModelExtension : ISerializerExtension
+	public sealed class TypeModelExtension : ISerializerExtension
 	{
 		public static TypeModelExtension Default { get; } = new TypeModelExtension();
 		TypeModelExtension() {}
@@ -35,10 +35,11 @@ namespace ExtendedXmlSerializer.ExtensionModel.Types
 		public IServiceRepository Get(IServiceRepository parameter)
 			=> parameter.Register<ITypedSortOrder, TypedSortOrder>()
 			            .Register<IActivation, Activation>()
-			            .Register<IActivators, Activators>()
+			            .Register<IActivators, DefaultActivators>()
 			            .Register<IActivatingTypeSpecification, ActivatingTypeSpecification>()
 			            .Register<IConstructorLocator, ConstructorLocator>()
 			            .Register<IEnumeratorStore, EnumeratorStore>()
+			            .Register<IDiscoveredTypes, DiscoveredTypes>()
 			            .RegisterInstance<IDictionaryEnumerators>(DictionaryEnumerators.Default)
 			            .RegisterInstance<IEnumerators>(Enumerators.Default)
 			            .RegisterInstance<IConstructors>(Constructors.Default)

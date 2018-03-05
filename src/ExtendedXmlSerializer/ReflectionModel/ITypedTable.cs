@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,5 +25,5 @@ using System.Reflection;
 
 namespace ExtendedXmlSerializer.ReflectionModel
 {
-	interface ITypedTable<T> : IMetadataTable<TypeInfo, T> {}
+	public interface ITypedTable<T> : IMetadataTable<TypeInfo, T> {}
 }

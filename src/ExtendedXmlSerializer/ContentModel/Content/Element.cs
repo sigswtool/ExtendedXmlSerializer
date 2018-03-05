@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,12 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Reflection;
 using ExtendedXmlSerializer.ContentModel.Identification;
+using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ContentModel.Content
 {
-	sealed class Element : ElementBase
+	sealed class Element : IElement
 	{
-		public Element(IIdentity identity) : base(identity) {}
+		readonly IIdentities _identities;
+		readonly IGeneric<IIdentity, IWriter> _adapter;
+
+		public Element(IIdentities identities) : this(identities, Adapter.Default) {}
+
+		public Element(IIdentities identities, IGeneric<IIdentity, IWriter> adapter)
+		{
+			_identities = identities;
+			_adapter = adapter;
+		}
+
+		public IWriter Get(TypeInfo parameter) => _adapter.Get(parameter)
+		                                                  .Invoke(_identities.Get(parameter));
+
+		sealed class Adapter : Generic<IIdentity, IWriter>
+		{
+			public static Adapter Default { get; } = new Adapter();
+			Adapter() : base(typeof(Writer<>)) {}
+
+			sealed class Writer<T> : GenericWriterAdapter<T>
+			{
+				public Writer(IIdentity identity) : base(new Identity<T>(identity)) {}
+			}
+		}
 	}
 }

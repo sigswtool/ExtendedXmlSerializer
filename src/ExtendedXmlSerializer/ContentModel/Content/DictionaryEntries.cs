@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using ExtendedXmlSerializer.ContentModel.Identification;
 using ExtendedXmlSerializer.ContentModel.Members;
 using ExtendedXmlSerializer.ReflectionModel;
 using JetBrains.Annotations;
@@ -50,9 +49,9 @@ namespace ExtendedXmlSerializer.ContentModel.Content
 		readonly IDictionaryPairTypesLocator _locator;
 
 		[UsedImplicitly]
-		public DictionaryEntries(IInnerContentServices contents, IIdentities identities, IMembers members,
+		public DictionaryEntries(IInnerContentServices contents, Element element, IMembers members,
 		                         IMemberSerializers serializers)
-			: this(MemberSerializationBuilder.Default.Get, contents, serializers, members, new ElementOption(identities).Get(Type), Pairs) {}
+			: this(MemberSerializationBuilder.Default.Get, contents, serializers, members, element.Get(Type), Pairs) {}
 
 		public DictionaryEntries(Func<IEnumerable<IMemberSerializer>, IMemberSerialization> builder,
 		                         IInnerContentServices contents, IMemberSerializers serializers, IMembers members,
@@ -72,13 +71,13 @@ namespace ExtendedXmlSerializer.ContentModel.Content
 		public ISerializer Get(TypeInfo parameter)
 		{
 			var pair = _locator.Get(parameter);
-			var serializers = new[] { Create(Key, pair.KeyType), Create(Value, pair.ValueType) };
+			var serializers = new[] {Create(Key, pair.KeyType), Create(Value, pair.ValueType)};
 			var serialization = _builder(serializers);
 
 			var reader = _contents.Create(Type, new MemberInnerContentHandler(serialization, _contents, _contents));
 
 			var converter = new Serializer(reader, new MemberListWriter(serialization));
-			var result = new Container(_element, converter);
+			var result = new Container<object>(_element, converter);
 			return result;
 		}
 	}

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace ExtendedXmlSerializer.Core.Sources
 {
-	sealed class Enumerable<T> : ItemsBase<T>
+	class Enumerable<T> : ItemsBase<T>
 	{
 		readonly IEnumerable<T> _enumerable;
 

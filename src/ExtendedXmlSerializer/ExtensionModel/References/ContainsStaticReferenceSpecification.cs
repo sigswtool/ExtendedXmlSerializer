@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,33 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Linq;
 using System.Reflection;
-using ExtendedXmlSerializer.ContentModel.Members;
+using ExtendedXmlSerializer.ContentModel.Reflection;
 using ExtendedXmlSerializer.Core.Sources;
 using ExtendedXmlSerializer.Core.Specifications;
-using ExtendedXmlSerializer.ExtensionModel.Types;
 
 namespace ExtendedXmlSerializer.ExtensionModel.References
 {
 	sealed class ContainsStaticReferenceSpecification : DelegatedSpecification<TypeInfo>, IStaticReferenceSpecification
 	{
-		public ContainsStaticReferenceSpecification(ITypeMembers members) : base(new Cache(members).Get) {}
+		public ContainsStaticReferenceSpecification(IDiscoveredTypes types) : base(new Source(types).Get) {}
 
-		sealed class Cache : CacheBase<TypeInfo, bool>
+		sealed class Source : StructureCacheBase<TypeInfo, bool>
 		{
-			readonly ITypeMembers _members;
+			readonly IDiscoveredTypes _types;
 
-			public Cache(ITypeMembers members)
-			{
-				_members = members;
-			}
+			public Source(IDiscoveredTypes types) => _types = types;
 
 			protected override bool Create(TypeInfo parameter)
 			{
-				var variables = new VariableTypeWalker(_members, parameter).Get()
-				                                                           .ToArray();
-				var length = variables.Length;
+				var variables = _types.Get(parameter);
+				var length    = variables.Length;
 				for (var i = 0; i < length; i++)
 				{
 					var first = variables[i];
@@ -62,6 +56,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.References
 						}
 					}
 				}
+
 				return false;
 			}
 		}

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +22,7 @@
 // SOFTWARE.
 
 using ExtendedXmlSerializer.ContentModel.Conversion;
-using ExtendedXmlSerializer.Core.Sources;
+using ExtendedXmlSerializer.Core.Parsing;
 using ExtendedXmlSerializer.Core.Sprache;
 
 namespace ExtendedXmlSerializer.ContentModel.Reflection
@@ -30,6 +30,6 @@ namespace ExtendedXmlSerializer.ContentModel.Reflection
 	sealed class TypePartsList : ItemsParser<TypeParts>
 	{
 		public static TypePartsList Default { get; } = new TypePartsList();
-		TypePartsList() : base(Parse.Ref(() => TypePartsParser.Default.Get())) {}
+		TypePartsList() : base(Parse.Ref(() => TypePartsParser.Default.ToParser())) {}
 	}
 }

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using ExtendedXmlSerializer.Core.Sources;
+using ExtendedXmlSerializer.Core.Parsing;
 using ExtendedXmlSerializer.Core.Sprache;
 using ExtendedXmlSerializer.ExtensionModel.Markup;
 
@@ -29,7 +29,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Expressions
 {
 	sealed class Expression : Parsing<IExpression>
 	{
-		readonly static Parser<IExpression> Text = new TextLiteral('\'').Get()
+		readonly static Parser<IExpression> Text = new TextLiteral('\'').ToParser()
 		                                                                .XOr(new TextLiteral('"'));
 
 		public Expression(params char[] except) : base(Text.XOr(new ContainedExpression(except))) {}

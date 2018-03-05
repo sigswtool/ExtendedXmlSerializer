@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@
 
 namespace ExtendedXmlSerializer.ContentModel.Reflection
 {
-	sealed class Identifier : Core.Sources.Identifier
+	sealed class Identifier : Core.Parsing.Identifier
 	{
 		public static Identifier Default { get; } = new Identifier();
 

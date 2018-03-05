@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,6 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using ExtendedXmlSerializer.ContentModel.Identification;
-using ExtendedXmlSerializer.Core;
 using ExtendedXmlSerializer.Core.Sources;
 using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ReflectionModel;
@@ -40,7 +39,7 @@ namespace ExtendedXmlSerializer.ContentModel.Reflection
 
 		GenericTypes(ISpecification<TypeInfo> specification, ITypeFormatter formatter)
 			: base(
-				new TypeCandidates(specification, formatter,
-				                   new AssemblyTypePartitions(specification, formatter.Get), TypeLoader.Default).Get) {}
+			       new TypeCandidates(specification, formatter,
+			                          new AssemblyTypePartitions(specification, formatter.Get), TypeLoader.Default).Get) {}
 	}
 }

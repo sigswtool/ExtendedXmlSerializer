@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,11 +25,11 @@ using ExtendedXmlSerializer.ContentModel.Format;
 
 namespace ExtendedXmlSerializer.ContentModel.Content
 {
-	class EndCurrentElement : IWriter
+	sealed class EndCurrentElement<T> : IWriter<T>
 	{
-		public static EndCurrentElement Default { get; } = new EndCurrentElement();
+		public static EndCurrentElement<T> Default { get; } = new EndCurrentElement<T>();
 		EndCurrentElement() {}
 
-		public void Write(IFormatWriter writer, object instance) => writer.EndCurrent();
+		public void Write(IFormatWriter writer, T instance) => writer.EndCurrent();
 	}
 }

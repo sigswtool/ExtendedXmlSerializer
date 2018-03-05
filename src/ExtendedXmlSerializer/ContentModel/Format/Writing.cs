@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,5 +33,18 @@ namespace ExtendedXmlSerializer.ContentModel.Format
 
 		public T Writer { get; }
 		public object Instance { get; }
+	}
+
+	public struct Writing<TWriter, TInstance>
+	{
+		public Writing(TWriter writer, TInstance instance)
+		{
+			Writer = writer;
+			Instance = instance;
+		}
+
+		public TWriter Writer { get; }
+
+		public TInstance Instance { get; }
 	}
 }

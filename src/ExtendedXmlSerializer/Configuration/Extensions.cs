@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,7 +42,7 @@ namespace ExtendedXmlSerializer.Configuration
 		public static IExtendedXmlSerializer Create(this IContext @this) => @this.Root.Create();
 
 		public static IRootContext Apply<T>(this IRootContext @this)
-			where T : class, ISerializerExtension => Apply(@this, Support<T>.New);
+			where T : class, ISerializerExtension => Apply(@this, Support<T>.NewOrSingleton);
 
 		public static IRootContext Apply<T>(this IRootContext @this, Func<T> create)
 			where T : class, ISerializerExtension
@@ -55,7 +55,7 @@ namespace ExtendedXmlSerializer.Configuration
 		}
 
 		public static T Add<T>(this IRootContext @this) where T : ISerializerExtension
-			=> Add(@this, Support<T>.New);
+			=> Add(@this, Support<T>.NewOrSingleton);
 
 		public static T Add<T>(this IRootContext @this, Func<T> create) where T : ISerializerExtension
 		{
@@ -92,6 +92,9 @@ namespace ExtendedXmlSerializer.Configuration
 			        .ToArray();
 
 		/*public static ITypeConfiguration Type(this IConfiguration @this, TypeInfo type) => @this.Get(type);*/
+
+		public static IConfigurationContainer Configured<T>(this IConfigurationContainer @this) where T : class, IConfigurationProfile
+			=> Support<T>.NewOrSingleton().Get(@this);
 
 		public static ITypeConfiguration<T> ConfigureType<T>(this IConfigurationContainer @this) => @this.Type<T>();
 
@@ -159,7 +162,13 @@ namespace ExtendedXmlSerializer.Configuration
 
 		public static IConfigurationContainer EnableReferences(this IConfigurationContainer @this)
 		{
-			@this.Root.Apply<ReferencesExtension>();
+			@this.Root.EnableReferences();
+			return @this;
+		}
+
+		public static IRootContext EnableReferences(this IRootContext @this)
+		{
+			@this.EnableRootInstances().With<ReferencesExtension>();
 			return @this;
 		}
 
@@ -179,8 +188,8 @@ namespace ExtendedXmlSerializer.Configuration
 
 		public static IMemberConfiguration<T, TMember> Identity<T, TMember>(this IMemberConfiguration<T, TMember> @this)
 		{
-			@this.Attribute()
-			     .Root
+			@this.Attribute().Root
+			     .EnableReferences()
 			     .With<ReferencesExtension>()
 			     .Assign(@this.Parent.AsValid<ITypeConfigurationContext>()
 			                  .Get(), ((ISource<MemberInfo>)@this).Get());

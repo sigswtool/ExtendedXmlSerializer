@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,12 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using ExtendedXmlSerializer.Configuration;
 using ExtendedXmlSerializer.ExtensionModel.Xml;
 using FluentAssertions;
 using JetBrains.Annotations;
+using System.Collections.Generic;
+using System.ComponentModel;
 using Xunit;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local

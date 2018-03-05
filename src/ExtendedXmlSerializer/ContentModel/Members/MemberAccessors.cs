@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,21 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using ExtendedXmlSerializer.Core.Sources;
 using ExtendedXmlSerializer.Core.Specifications;
 
 namespace ExtendedXmlSerializer.ContentModel.Members
 {
-	sealed class MemberAccessors : DelegatedSource<IMember, IMemberAccess>, IMemberAccessors
+	sealed class MemberAccessors : DecoratedSource<IMember, IMemberAccess>, IMemberAccessors
 	{
 		public MemberAccessors(WritableMemberAccessors accessors, ReadOnlyCollectionAccessors @readonly)
-			: base(new Selector<IMember, IMemberAccess>(new Option(x => x.IsWritable, accessors), @readonly).Get) {}
+			: this((IParameterizedSource<IMember, IMemberAccess>) accessors, @readonly) {}
 
-		sealed class Option : DecoratedOption<IMember, IMemberAccess>
-		{
-			public Option(Func<IMember, bool> specification, IMemberAccessors source)
-				: base(new DelegatedSpecification<IMember>(specification), source) {}
-		}
+		MemberAccessors(IParameterizedSource<IMember, IMemberAccess> accessors,
+		                IParameterizedSource<IMember, IMemberAccess> @readonly)
+			: base(@readonly.If(ReadOnlyCollectionSpecification.Default)
+			                .Let(new DelegatedSpecification<IMember>(x => x.IsWritable),
+			                     AlteredValueSpecification<IMemberAccess>.Default, accessors)) {}
 	}
 }

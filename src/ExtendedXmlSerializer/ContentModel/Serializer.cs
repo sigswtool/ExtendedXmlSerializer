@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,19 +25,9 @@ using ExtendedXmlSerializer.ContentModel.Format;
 
 namespace ExtendedXmlSerializer.ContentModel
 {
-	class Serializer : ISerializer
+	class Serializer : Serializer<object>, ISerializer
 	{
-		readonly IReader _reader;
-		readonly IWriter _writer;
-
-		public Serializer(IReader reader, IWriter writer)
-		{
-			_reader = reader;
-			_writer = writer;
-		}
-
-		public void Write(IFormatWriter writer, object instance) => _writer.Write(writer, instance);
-		public object Get(IFormatReader reader) => _reader.Get(reader);
+		public Serializer(IReader reader, IWriter writer) : base(reader, writer) {}
 	}
 
 	class Serializer<T> : ISerializer<T>

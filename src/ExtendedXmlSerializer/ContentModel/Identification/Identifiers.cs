@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,11 +30,11 @@ namespace ExtendedXmlSerializer.ContentModel.Identification
 	sealed class Identifiers : IIdentifiers
 	{
 		readonly IReadOnlyDictionary<Assembly, IIdentity> _known;
-		readonly INamespaceFormatter _formatter;
+		readonly INamespaceFormatter                      _formatter;
 
 		public Identifiers(IReadOnlyDictionary<Assembly, IIdentity> known, INamespaceFormatter formatter)
 		{
-			_known = known;
+			_known     = known;
 			_formatter = formatter;
 		}
 

@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,17 +22,15 @@
 // SOFTWARE.
 
 using System.Reflection;
-using System.Xml.Serialization;
 using ExtendedXmlSerializer.Core.Sources;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Xml
 {
-	sealed class DefaultMemberOrder : IParameterizedSource<MemberInfo, int>
+	public sealed class DefaultMemberOrder : IParameterizedSource<MemberInfo, int>
 	{
 		public static DefaultMemberOrder Default { get; } = new DefaultMemberOrder();
 		DefaultMemberOrder() {}
 
-		public int Get(MemberInfo parameter)
-			=> parameter.GetCustomAttribute<XmlElementAttribute>(false)?.Order ?? parameter.MetadataToken;
+		public int Get(MemberInfo parameter) => DefaultXmlElementAttribute.Default.Get(parameter)?.Order ?? parameter.MetadataToken;
 	}
 }

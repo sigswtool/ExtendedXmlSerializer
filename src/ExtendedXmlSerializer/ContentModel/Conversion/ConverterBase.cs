@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,7 @@ namespace ExtendedXmlSerializer.ContentModel.Conversion
 {
 	abstract class ConverterBase<T> : DecoratedSpecification<TypeInfo>, IConverter<T>
 	{
-		readonly protected static TypeEqualitySpecification<T> Specification = TypeEqualitySpecification<T>.Default;
+		protected readonly static TypeEqualitySpecification<T> Specification = TypeEqualitySpecification<T>.Default;
 
 		protected ConverterBase() : this(Specification) {}
 

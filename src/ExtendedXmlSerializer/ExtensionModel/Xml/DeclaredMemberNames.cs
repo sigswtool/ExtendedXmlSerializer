@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,13 +28,13 @@ using ExtendedXmlSerializer.Core;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Xml
 {
-	sealed class DeclaredMemberNames : INames
+	public sealed class DeclaredMemberNames : INames
 	{
 		public static DeclaredMemberNames Default { get; } = new DeclaredMemberNames();
 		DeclaredMemberNames() {}
 
 		public string Get(MemberInfo parameter)
 			=> parameter.GetCustomAttribute<XmlAttributeAttribute>(false)?.AttributeName.NullIfEmpty() ??
-			   parameter.GetCustomAttribute<XmlElementAttribute>(false)?.ElementName.NullIfEmpty();
+			   DefaultXmlElementAttribute.Default.Get(parameter)?.ElementName.NullIfEmpty();
 	}
 }

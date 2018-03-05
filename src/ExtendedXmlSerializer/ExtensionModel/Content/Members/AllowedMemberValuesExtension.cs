@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,23 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using ExtendedXmlSerializer.ContentModel.Members;
+using ExtendedXmlSerializer.Core;
+using ExtendedXmlSerializer.Core.Sources;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using ExtendedXmlSerializer.ContentModel.Members;
-using ExtendedXmlSerializer.Core;
-using ExtendedXmlSerializer.Core.Sources;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 {
-	sealed class AllowedMemberValuesExtension : Collection<IAllowedMemberValues>, ISerializerExtension
+	public sealed class AllowedMemberValuesExtension : Collection<IAllowedMemberValues>, ISerializerExtension
 	{
-		readonly static AllowAssignedValues AllowAssignedValues = AllowAssignedValues.Default;
-
 		readonly IAllowedValueSpecification _allowed;
 
-		public AllowedMemberValuesExtension() : this(AllowAssignedValues) {}
+		public AllowedMemberValuesExtension() : this(AllowAssignedValues.Default) {}
 
 		public AllowedMemberValuesExtension(IAllowedValueSpecification allowed)
 			: this(allowed, new Dictionary<MemberInfo, IAllowedValueSpecification>()) {}

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,4 +27,20 @@ using System.Reflection;
 namespace ExtendedXmlSerializer.ContentModel.Content
 {
 	public interface ISerializers : IParameterizedSource<TypeInfo, ISerializer> {}
+
+	public interface ISerializers<T> : ISource<ISerializer<T>> {}
+
+	sealed class Serializers<T> : ISerializers<T>
+	{
+		readonly IElements<T> _elements;
+		readonly IContents<T> _contents;
+
+		public Serializers(IElements<T> elements, IContents<T> contents)
+		{
+			_elements = elements;
+			_contents = contents;
+		}
+
+		public ISerializer<T> Get() => new Container<T>(_elements.Get(), _contents.Get());
+	}
 }

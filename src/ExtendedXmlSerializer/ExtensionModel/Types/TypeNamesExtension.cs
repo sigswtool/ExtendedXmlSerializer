@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ExtendedXmlSerializer.Configuration;
-using ExtendedXmlSerializer.ContentModel.Content;
 using ExtendedXmlSerializer.ContentModel.Identification;
 using ExtendedXmlSerializer.ContentModel.Reflection;
 using ExtendedXmlSerializer.Core.Sources;
@@ -33,7 +32,7 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Types
 {
-	sealed class TypeNamesExtension : ISerializerExtension
+	public sealed class TypeNamesExtension : ISerializerExtension
 	{
 		readonly static IDictionary<TypeInfo, string> Defaults = DefaultNames.Default;
 
@@ -43,7 +42,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Types
 
 		public TypeNamesExtension(IDictionary<TypeInfo, string> names, IDictionary<TypeInfo, string> defaults)
 		{
-			Names = names;
+			Names     = names;
 			_defaults = defaults;
 		}
 
@@ -52,7 +51,6 @@ namespace ExtendedXmlSerializer.ExtensionModel.Types
 		public IServiceRepository Get(IServiceRepository parameter)
 			=> parameter.RegisterInstance(_defaults)
 			            .Register<IAssemblyTypePartitions, AssemblyTypePartitions>()
-			            .Register<IElements, Elements>()
 			            .Register<ITypeFormatter, TypeFormatter>()
 			            .Register<ITypePartResolver, TypePartResolver>()
 			            .RegisterInstance<IReadOnlyDictionary<Assembly, IIdentity>>(WellKnownIdentities.Default)
@@ -63,11 +61,9 @@ namespace ExtendedXmlSerializer.ExtensionModel.Types
 			            .Register<ITypes, ContentModel.Reflection.Types>()
 			            .Register<IGenericTypes, GenericTypes>()
 			            .RegisterInstance<IPartitionedTypeSpecification>(PartitionedTypeSpecification.Default)
-			            .Register(Register);
-
-		INames Register(IServiceProvider provider) => new Names(new TypedTable<string>(Names)
-			                                                        .Or(DeclaredNames.Default)
-			                                                        .Or(new TypedTable<string>(_defaults)));
+			            .RegisterInstance<INames>(new Names(new TypedTable<string>(Names).Or(DeclaredNames.Default)
+			                                                                             .Or(new TypedTable<string
+			                                                                                 >(_defaults))));
 
 		public void Execute(IServices parameter) {}
 	}

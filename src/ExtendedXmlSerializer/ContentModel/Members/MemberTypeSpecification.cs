@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,10 +30,7 @@ namespace ExtendedXmlSerializer.ContentModel.Members
 	{
 		readonly ISpecification<TypeInfo> _specification;
 
-		public MemberTypeSpecification(ISpecification<TypeInfo> specification)
-		{
-			_specification = specification;
-		}
+		public MemberTypeSpecification(ISpecification<TypeInfo> specification) => _specification = specification;
 
 		public bool IsSatisfiedBy(IMember parameter) => _specification.IsSatisfiedBy(parameter.MemberType);
 	}

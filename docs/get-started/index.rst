@@ -4,7 +4,7 @@ Information
 Support platforms:
 
 * .NET 4.5
-* .NET Platform Standard 1.6
+* .NET Standard 2.0
 
 Support features:
 
@@ -15,7 +15,8 @@ Support features:
 * Deserialization of old version of xml
 * Property encryption
 * Custom serializer
-* Support `XmlElementAttribute` and `XmlRootAttribute`
+* Support `XmlElementAttribute`, `XmlRootAttribute`, and `XmlTypeAttribute` for identity resolution.
+* Additional attribute support: `XmlIgnoreAttribute`, `XmlAttributeAttribute`, and `XmlEnumAttribute`.
 * POCO - all configurations (migrations, custom serializer...) are outside the clas
 
 Standard XML Serializer in .NET is very limited:
@@ -141,17 +142,17 @@ ExtendedXmlSerializer use fluent API to configuration. Example:
 
 .. sourcecode:: csharp
 
-    var serializer = new ConfigurationContainer()
-        .UseEncryptionAlgorithm(new CustomEncryption())
-        .Type<Person>() // Configuration of Person class
-            .Member(p => p.Password) // First member
-                .Name("P")
-                .Encrypt()
-            .Member(p => p.Name) // Second member
-                .Name("T")
-        .Type<TestClass>() // Configuration of another class
-            .CustomSerializer(new TestClassSerializer())
-        .Create();
+                var serializer = new ConfigurationContainer()
+                    .UseEncryptionAlgorithm(new CustomEncryption())
+                    .Type<Person>() // Configuration of Person class
+                        .Member(p => p.Password) // First member
+                            .Name("P")
+                            .Encrypt()
+                        .Member(p => p.Name) // Second member
+                            .Name("T")
+                    .Type<TestClass>() // Configuration of another class
+                        .CustomSerializer(new TestClassSerializer())
+                    .Create();
 
 Serialization of dictionary
 ===========================
@@ -284,11 +285,11 @@ If you had a class:
 
 .. sourcecode:: csharp
 
-    public class TestClass
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-    }
+        public class TestClass
+        {
+            public int Id { get; set; }
+            public string Type { get; set; }
+        }
 
 and generated XML look like:
 
@@ -304,11 +305,11 @@ Then you renamed property:
 
 .. sourcecode:: csharp
 
-    public class TestClass
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+        public class TestClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
 
 and generated XML look like:
 
@@ -633,7 +634,7 @@ The default behavior for emitting data in an Xml document is to use elements, wh
     <SubjectWithThreeProperties xmlns="clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples">
       <Number>123</Number>
       <Message>Hello World!</Message>
-      <Time>2017-11-21T10:55:38.0990077+01:00</Time>
+      <Time>2018-01-26T10:27:57.3304845-05:00</Time>
     </SubjectWithThreeProperties>
 
 Making use of the `UseAutoFormatting` call will enable all types that have a registered `IConverter` (convert to string and back) to emit as attributes:
@@ -641,7 +642,40 @@ Making use of the `UseAutoFormatting` call will enable all types that have a reg
 .. sourcecode:: xml
 
     <?xml version="1.0" encoding="utf-8"?>
-    <SubjectWithThreeProperties Number="123" Message="Hello World!" Time="2017-11-21T10:55:38.0990077+01:00" xmlns="clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples" />
+    <SubjectWithThreeProperties Number="123" Message="Hello World!" Time="2018-01-26T10:27:57.3304845-05:00" xmlns="clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples" />
+
+Verbatim Content (CDATA)
+========================
+
+If you have an element with a member that can hold lots of data, or data that has illegal characters, you configure it to be a verbatim field and it will emit a CDATA section around it:
+
+.. sourcecode:: csharp
+
+    var serializer = new ConfigurationContainer().Type<Subject>()
+                                                    .Member(x => x.Message)
+                                                    .Verbatim()
+                                                    .Create();
+    var subject = new Subject {Message = @"<{""Ilegal characters and such""}>"};
+    var contents = serializer.Serialize(subject);
+    // ...
+
+
+.. sourcecode:: xml
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <Subject xmlns="clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples">
+      <Message><![CDATA[<{"Ilegal characters and such"}>]]></Message>
+    </Subject>
+
+You can also denote these fields with an attribute and get the same functionality:
+
+.. sourcecode:: csharp
+
+    public sealed class VerbatimSubject
+    {
+        [Verbatim]
+        public string Message { get; set; }
+    }
 
 Private Constructors
 ====================
@@ -715,7 +749,7 @@ Taking this concept bit further leads to a favorite feature of ours in `Extended
     <ParameterizedSubject xmlns="clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples">
       <Message>Hello World!</Message>
       <Number>123</Number>
-      <Time>2017-11-21T10:55:38.3180296+01:00</Time>
+      <Time>2018-01-26T10:27:57.488419-05:00</Time>
     </ParameterizedSubject>
 
 Tuples

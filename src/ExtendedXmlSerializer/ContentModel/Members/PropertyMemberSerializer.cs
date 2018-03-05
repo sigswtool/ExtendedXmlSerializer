@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,10 +29,7 @@ namespace ExtendedXmlSerializer.ContentModel.Members
 	{
 		readonly IMemberSerializer _serializer;
 
-		public PropertyMemberSerializer(IMemberSerializer serializer)
-		{
-			_serializer = serializer;
-		}
+		public PropertyMemberSerializer(IMemberSerializer serializer) => _serializer = serializer;
 
 		public object Get(IFormatReader parameter) => _serializer.Get(parameter);
 

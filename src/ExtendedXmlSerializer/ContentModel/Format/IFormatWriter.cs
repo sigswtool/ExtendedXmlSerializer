@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,8 +29,6 @@ namespace ExtendedXmlSerializer.ContentModel.Format
 {
 	public interface IFormatWriter : IFormat, IFormatter<MemberInfo>
 	{
-		object Instance { get; }
-
 		void Start(IIdentity identity);
 
 		void EndCurrent();
@@ -38,5 +36,7 @@ namespace ExtendedXmlSerializer.ContentModel.Format
 		void Content(IIdentity property, string content);
 
 		void Content(string content);
+
+		void Verbatim(string content);
 	}
 }

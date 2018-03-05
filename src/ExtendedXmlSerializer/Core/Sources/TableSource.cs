@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,11 +25,13 @@ using System.Collections.Generic;
 
 namespace ExtendedXmlSerializer.Core.Sources
 {
-	class TableSource<TKey, TValue> : ITableSource<TKey, TValue>
+	public class TableSource<TKey, TValue> : ITableSource<TKey, TValue>
 	{
 		readonly IDictionary<TKey, TValue> _store;
 
 		public TableSource() : this(new Dictionary<TKey, TValue>()) {}
+
+		public TableSource(IEqualityComparer<TKey> comparer) : this(new Dictionary<TKey, TValue>(comparer)) {}
 
 		public TableSource(IDictionary<TKey, TValue> store)
 		{

@@ -1,18 +1,18 @@
 ﻿// MIT License
-// 
-// Copyright (c) 2016 Wojciech Nagórski
+//
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 using ExtendedXmlSerializer.Core.Sources;
-using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ReflectionModel;
 using System;
 using System.Collections.Generic;
@@ -48,6 +47,8 @@ namespace ExtendedXmlSerializer.Core
 			action(@this);
 			return @this;
 		}
+
+		public static T Alter<T>(this T @this, Func<T, T> action) => @this != null ? action(@this) : default(T);
 
 
 		public static string Quoted(this string @this) => QuotedAlteration.Default.Get(@this);
@@ -105,24 +106,43 @@ namespace ExtendedXmlSerializer.Core
 			}
 		}
 
-		public static ISpecification<T> Any<T>(this ISpecification<T> @this, params T[] parameters)
-			=> new AnySpecification<T>();
-
-		public static ISpecification<T> Or<T>(this ISpecification<T> @this, params ISpecification<T>[] others)
-			=> new AnySpecification<T>(@this.Yield()
-			                                .Concat(others)
-			                                .Fixed());
-
-		public static ISpecification<T> And<T>(this ISpecification<T> @this, params ISpecification<T>[] others)
-			=> new AllSpecification<T>(@this.Yield()
-			                                .Concat(others)
-			                                .Fixed());
-
 		public static T[] Fixed<T>(this IEnumerable<T> @this) => @this as T[] ?? @this.ToArray();
 
+		public static KeyedByTypeCollection<T> KeyedByType<T>(this IEnumerable<T> @this) =>
+			@this as KeyedByTypeCollection<T> ?? new KeyedByTypeCollection<T>(@this);
+
+		public static ICollection<T> AddOrReplace<T, TItem>(this ICollection<T> @this, TItem item)
+		{
+			var source = @this.KeyedByType()
+			                  .AddOrReplace(item);
+			@this.SynchronizeFrom(source);
+			return @this;
+		}
+
+		public static bool Removing<T, TItem>(this ICollection<T> @this, TItem item)
+		{
+			var source = @this.KeyedByType();
+			var result = source.Remove(item);
+			@this.SynchronizeFrom(source);
+			return result;
+		}
+
+		public static ICollection<T> SynchronizeFrom<T>(this ICollection<T> @this, IEnumerable<T> source)
+		{
+			if (!ReferenceEquals(@this, source))
+			{
+				@this.Clear();
+				foreach (var item in source)
+				{
+					@this.Add(item);
+				}
+			}
+
+			return @this;
+		}
+
 		public static TypeInfo AccountForNullable(this TypeInfo @this)
-			=> Nullable.GetUnderlyingType(@this.AsType())
-			           ?.GetTypeInfo() ?? @this;
+			=> AccountForNullableAlteration.Default.Get(@this);
 
 		public static Func<TParameter, TResult>
 			ReferenceCache<TParameter, TResult>(this Func<TParameter, TResult> @this)
@@ -139,11 +159,7 @@ namespace ExtendedXmlSerializer.Core
 		public static IEnumerable<TValue> Get<TKey, TValue>(this ILookup<TKey, TValue> target, TKey key) => target[key];
 
 		public static TValue? GetStructure<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key)
-			where TValue : struct
-		{
-			TValue result;
-			return target.TryGetValue(key, out result) ? result : (TValue?) null;
-		}
+			where TValue : struct => target.TryGetValue(key, out var result) ? result : (TValue?) null;
 
 		public static IEnumerable<T> Appending<T>(this IEnumerable<T> @this, params T[] items) => @this.Concat(items);
 
@@ -157,27 +173,18 @@ namespace ExtendedXmlSerializer.Core
 			yield return @this;
 		}
 
-		public static IEnumerable<TypeInfo> YieldMetadata(this IEnumerable<Type> @this,
-		                                                  Func<TypeInfo, bool> specification = null)
-		{
-			var select = @this.Select(x => x.GetTypeInfo());
-			var result = specification != null ? select.Where(specification) : select;
-			return result;
-		}
+		public static IEnumerable<TypeInfo> YieldMetadata(this IEnumerable<Type> @this) => @this.Select(x => x.GetTypeInfo());
 
-		public static ImmutableArray<TypeInfo> ToMetadata(this IEnumerable<Type> @this,
-		                                                  Func<TypeInfo, bool> specification = null)
-			=> @this.YieldMetadata(specification)
+		public static ImmutableArray<TypeInfo> ToMetadata(this IEnumerable<Type> @this)
+			=> @this.YieldMetadata()
 			        .ToImmutableArray();
 
+		public static IEnumerable<Type> YieldTypes(this IEnumerable<TypeInfo> @this) => @this.Select(x => x.GetTypeInfo());
 
-		public static ISpecification<T> Inverse<T>(this ISpecification<T> @this) => new InverseSpecification<T>(@this);
+		public static ImmutableArray<Type> ToTypes(this IEnumerable<TypeInfo> @this)
+			=> @this.YieldTypes()
+			        .ToImmutableArray();
 
-		public static ISpecification<object> AdaptForNull<T>(this ISpecification<T> @this)
-			=> new NullAwareSpecificationAdapter<T>(@this);
-
-		public static ISpecification<object> Adapt<T>(this ISpecification<T> @this)
-			=> new SpecificationAdapter<T>(@this);
 
 		public static T To<T>(this object @this) => @this is T ? (T) @this : default(T);
 
@@ -194,15 +201,28 @@ namespace ExtendedXmlSerializer.Core
 				          .AsValid<T>($"Could not located service '{typeof(T)}'");
 
 
+		public static void ForEach<TIn, TOut>(this IEnumerable<TIn> @this, Func<TIn, TOut> select)
+		{
+			foreach (var @in in @this)
+			{
+				select(@in);
+			}
+		}
+
 		public static T AsValid<T>(this object @this, string message = null)
 		{
-			if (@this is T)
+			if (@this != null)
 			{
-				return (T) @this;
+				if (@this is T)
+				{
+					return (T) @this;
+				}
+
+				throw new InvalidOperationException(message ??
+				                                    $"'{@this.GetType() .FullName}' is not of type {typeof(T).FullName}.");
 			}
 
-			throw new InvalidOperationException(message ??
-			                                    $"'{@this.GetType() .FullName}' is not of type {typeof(T).FullName}.");
+			return default(T);
 		}
 	}
 }

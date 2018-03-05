@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,23 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using ExtendedXmlSerializer.ContentModel;
+using ExtendedXmlSerializer.ContentModel.Content;
 using System;
 using System.Reflection;
-using ExtendedXmlSerializer.ContentModel;
-using ExtendedXmlSerializer.Core.Sources;
-using IContents = ExtendedXmlSerializer.ContentModel.Content.IContents;
 
 namespace ExtendedXmlSerializer.ExtensionModel.References
 {
-	sealed class DeferredContents : CacheBase<TypeInfo, ISerializer>, IContents
+	sealed class DeferredContents : IContents
 	{
 		readonly Func<IContents> _contents;
 
-		public DeferredContents(Func<IContents> contents)
-		{
-			_contents = contents;
-		}
+		public DeferredContents(Func<IContents> contents) => _contents = contents;
 
-		protected override ISerializer Create(TypeInfo parameter) => _contents().Get(parameter);
+		public ISerializer Get(TypeInfo parameter) => _contents()
+			.Get(parameter);
 	}
 }

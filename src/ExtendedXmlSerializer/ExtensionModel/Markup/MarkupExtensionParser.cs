@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +22,7 @@
 // SOFTWARE.
 
 using ExtendedXmlSerializer.Core;
-using ExtendedXmlSerializer.Core.Sources;
+using ExtendedXmlSerializer.Core.Parsing;
 using ExtendedXmlSerializer.Core.Sprache;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Markup
@@ -31,8 +31,8 @@ namespace ExtendedXmlSerializer.ExtensionModel.Markup
 	{
 		public static MarkupExtensionParser Default { get; } = new MarkupExtensionParser();
 
-		MarkupExtensionParser() : base(MarkupExtensionExpression.Default.Get().End().ToDelegate()
+		MarkupExtensionParser() : base(MarkupExtensionExpression.Default.ToParser().End().ToDelegate()
 		                                                        .Cache()
-		                                                        .ToParser()) {}
+		                                                        .Get()) {}
 	}
 }

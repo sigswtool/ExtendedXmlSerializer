@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -59,6 +59,7 @@ namespace ExtendedXmlSerializer.Samples
 			AttachedProperties.Default.Execute(null);
 			MarkupExtensions.Default.Execute(null);
 			Example.Default.Execute(null);
+			VerbatimContent.Default.Execute(null);
 
 			SimpleSamples.Run();
 			DictianarySamples.Run();

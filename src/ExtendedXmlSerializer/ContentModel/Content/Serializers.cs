@@ -1,18 +1,18 @@
 ﻿// MIT License
-// 
-// Copyright (c) 2016 Wojciech Nagórski
+//
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,26 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Reflection;
-using ExtendedXmlSerializer.Core;
 using JetBrains.Annotations;
+using System.Reflection;
 
 namespace ExtendedXmlSerializer.ContentModel.Content
 {
 	[UsedImplicitly]
 	sealed class Serializers : ISerializers
 	{
-		readonly IElements _elements;
+		readonly IElement _element;
 		readonly IContents _contents;
 
-		public Serializers(IElements elements, IContents contents)
+		public Serializers(IElement element, IContents contents)
 		{
-			_elements = elements;
+			_element = element;
 			_contents = contents;
 		}
 
-		public ISerializer Get(TypeInfo parameter) => Create(parameter.AccountForNullable());
-
-		ISerializer Create(TypeInfo parameter) => new Container(_elements.Get(parameter), _contents.Get(parameter));
+		public ISerializer Get(TypeInfo parameter) => new Container(_element.Get(parameter), _contents.Get(parameter));
 	}
+
 }

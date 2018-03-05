@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 {
-	sealed class MemberPropertiesExtension : ISerializerExtension
+	public sealed class MemberPropertiesExtension : ISerializerExtension
 	{
 		readonly INames _defaultNames;
 		readonly IParameterizedSource<MemberInfo, int> _defaultMemberOrder;

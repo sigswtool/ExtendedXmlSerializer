@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,13 +31,10 @@ namespace ExtendedXmlSerializer.ContentModel.Properties
 	{
 		readonly IProperty<T> _property;
 
-		public ConverterProperty(IConverter<T> converter, IIdentity identity)
+		public ConverterProperty(IConvert<T> converter, IIdentity identity)
 			: this(new DelegatedProperty<T>(converter.Parse, converter.Format, identity)) {}
 
-		public ConverterProperty(IProperty<T> property)
-		{
-			_property = property;
-		}
+		public ConverterProperty(IProperty<T> property) => _property = property;
 
 		public T Get(IFormatReader parameter) => _property.Get(parameter);
 

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Xml
 {
 	sealed class DefaultXmlContentsActivator : IXmlContentsActivator
 	{
-		public static DefaultXmlContentsActivator Default { get; } = new DefaultXmlContentsActivator();
+		public static IXmlContentsActivator Default { get; } = new DefaultXmlContentsActivator();
 		DefaultXmlContentsActivator() {}
 
 		public IInnerContent Create(IFormatReader reader, object instance, XmlContent content)

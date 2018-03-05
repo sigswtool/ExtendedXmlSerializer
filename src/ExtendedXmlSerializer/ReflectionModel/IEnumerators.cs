@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,12 +27,4 @@ using ExtendedXmlSerializer.Core.Sources;
 namespace ExtendedXmlSerializer.ReflectionModel
 {
 	interface IEnumerators : IParameterizedSource<IEnumerable, IEnumerator> {}
-
-	sealed class Enumerators : IEnumerators
-	{
-		public static Enumerators Default { get; } = new Enumerators();
-		Enumerators() {}
-
-		public IEnumerator Get(IEnumerable parameter) => parameter.GetEnumerator();
-	}
 }

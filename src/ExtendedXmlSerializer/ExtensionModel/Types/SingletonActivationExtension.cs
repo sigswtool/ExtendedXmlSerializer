@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +33,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Types
 		public IServiceRepository Get(IServiceRepository parameter)
 			=> parameter.RegisterInstance<ISingletonCandidates>(SingletonCandidates.Default)
 			            .RegisterInstance<ISingletonLocator>(SingletonLocator.Default)
-			            .Decorate<IActivators, SingletonAwareActivators>();
+			            .Decorate<IActivators, Activators>();
 
 		public void Execute(IServices parameter) {}
 	}

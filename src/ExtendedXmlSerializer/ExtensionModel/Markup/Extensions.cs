@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,15 +24,13 @@
 using ExtendedXmlSerializer.Configuration;
 using ExtendedXmlSerializer.ExtensionModel.Content;
 using ExtendedXmlSerializer.ExtensionModel.Expressions;
-using ExtendedXmlSerializer.ExtensionModel.Types;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Markup
 {
 	public static class Extensions
 	{
 		public static IConfigurationContainer EnableMarkupExtensions(this IConfigurationContainer @this)
-			=> @this.EnableSingletons()
-			        .EnableExpressions()
+			=> @this.EnableExpressions()
 			        .Alter(MarkupExtensionConverterAlteration.Default)
 			        .Extend(MarkupExtension.Default);
 	}

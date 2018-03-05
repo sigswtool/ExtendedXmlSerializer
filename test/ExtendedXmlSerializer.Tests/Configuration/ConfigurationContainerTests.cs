@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +32,6 @@ using ExtendedXmlSerializer.Tests.TestObject;
 using JetBrains.Annotations;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -110,11 +109,11 @@ namespace ExtendedXmlSerializer.Tests.Configuration
 			var config = Configure(cfg =>
 								   {
 									   var t = cfg.ConfigureType<TestClassPrimitiveTypes>();
-									   Assert.Null(cfg.Root.With<CustomXmlExtension>().Get(t.Get()));
+									   Assert.Null(cfg.Root.With<CustomSerializationExtension>().XmlSerializers.Get(t.Get()));
 									   t.CustomSerializer((writer, types) => { }, element => null);
 								   });
 			var type = config.GetTypeConfiguration(typeof(TestClassPrimitiveTypes));
-			Assert.NotNull(config.Root.With<CustomXmlExtension>().Get(type.Get()));
+			Assert.NotNull(config.Root.With<CustomSerializationExtension>().XmlSerializers.Get(type.Get()));
 		}
 
 		[Fact]

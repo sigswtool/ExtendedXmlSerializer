@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,22 +25,31 @@ using ExtendedXmlSerializer.ContentModel.Format;
 
 namespace ExtendedXmlSerializer.ContentModel.Content
 {
-	sealed class Enclosure : EnclosureBase
+	sealed class Enclosure : Enclosure<object>
 	{
-		readonly static EndCurrentElement End = EndCurrentElement.Default;
+		public Enclosure(IWriter<object> start, IWriter<object> body) : base(start, body) {}
+	}
 
-		readonly IWriter _start, _finish;
+	class Enclosure<T> : IWriter<T>
+	{
+		readonly IWriter<T> _start;
+		readonly IWriter<T> _body;
+		readonly IWriter<T> _finish;
 
-		public Enclosure(IWriter start, IWriter body) : this(start, body, End) {}
+		public Enclosure(IWriter<T> start, IWriter<T> body) : this(start, body, EndCurrentElement<T>.Default) { }
 
-		public Enclosure(IWriter start, IWriter body, IWriter finish) : base(body)
+		public Enclosure(IWriter<T> start, IWriter<T> body, IWriter<T> finish)
 		{
 			_start = start;
+			_body = body;
 			_finish = finish;
 		}
 
-		protected override void Start(IFormatWriter writer, object instance) => _start.Write(writer, instance);
-
-		protected override void Finish(IFormatWriter writer, object instance) => _finish.Write(writer, instance);
+		public void Write(IFormatWriter writer, T instance)
+		{
+			_start.Write(writer, instance);
+			_body.Write(writer, instance);
+			_finish.Write(writer, instance);
+		}
 	}
 }

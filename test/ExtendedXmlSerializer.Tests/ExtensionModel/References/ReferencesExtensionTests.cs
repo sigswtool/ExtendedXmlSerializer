@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,7 +43,7 @@ namespace ExtendedXmlSerializer.Tests.ExtensionModel.References
 		[Fact]
 		public void SimpleIdentity()
 		{
-			var support = new SerializationSupport(new ConfigurationContainer().Extend(new ReferencesExtension())
+			var support = new SerializationSupport(new ConfigurationContainer().EnableReferences()
 			                                                                   .Create());
 			var instance = new Subject {Id = new Guid("{0E2DECA4-CC38-46BA-9C47-94B8070D7353}"), PropertyName = "Hello World!"};
 			instance.Self = instance;
@@ -56,8 +56,8 @@ namespace ExtendedXmlSerializer.Tests.ExtensionModel.References
 		[Fact]
 		public void EnabledWithoutConfiguration()
 		{
-			var support = new SerializationSupport(new ConfigurationContainer().Extend(new ReferencesExtension())
-			                                                                   .Create());
+			var support = new SerializationSupport(new ConfigurationContainer().EnableReferences()
+																			   .Create());
 			var expected = new Subject
 			               {
 				               Id = Guid,

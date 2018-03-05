@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,21 +24,22 @@
 using System.Reflection;
 using System.Xml.Serialization;
 using ExtendedXmlSerializer.ContentModel.Members;
-using ExtendedXmlSerializer.Core;
+using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Xml
 {
-	sealed class DefaultMetadataSpecification : MetadataSpecification
+	public sealed class DefaultMetadataSpecification : MetadataSpecification
 	{
 		readonly static MemberSpecification<PropertyInfo> Property =
 			new MemberSpecification<PropertyInfo>(PropertyMemberSpecification.Default);
 
 		readonly static MemberSpecification<FieldInfo> Field =
 			new MemberSpecification<FieldInfo>(new FieldMemberSpecification(
-				                                   IsDefinedSpecification<XmlElementAttribute>.Default.Or(
-					                                   IsDefinedSpecification
-						                                   <XmlAttributeAttribute>.Default)));
+			                                                                IsDefinedSpecification<XmlElementAttribute>
+				                                                                .Default.Or(
+				                                                                            IsDefinedSpecification
+					                                                                            <XmlAttributeAttribute>.Default)));
 
 		public static DefaultMetadataSpecification Default { get; } = new DefaultMetadataSpecification();
 		DefaultMetadataSpecification() : base(Property, Field) {}

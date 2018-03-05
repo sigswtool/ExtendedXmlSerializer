@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,6 +31,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTrademark("")]
 [assembly: InternalsVisibleTo("ExtendedXmlSerializer.Tests")]
+[assembly: InternalsVisibleTo("ExtendedXmlSerializer.Integration")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

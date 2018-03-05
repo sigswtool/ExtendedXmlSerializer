@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,14 +23,11 @@
 
 namespace ExtendedXmlSerializer.Core.Specifications
 {
-	class DecoratedSpecification<T> : ISpecification<T>
+	public class DecoratedSpecification<T> : ISpecification<T>
 	{
 		readonly ISpecification<T> _specification;
 
-		public DecoratedSpecification(ISpecification<T> specification)
-		{
-			_specification = specification;
-		}
+		public DecoratedSpecification(ISpecification<T> specification) => _specification = specification;
 
 		public virtual bool IsSatisfiedBy(T parameter) => _specification.IsSatisfiedBy(parameter);
 	}

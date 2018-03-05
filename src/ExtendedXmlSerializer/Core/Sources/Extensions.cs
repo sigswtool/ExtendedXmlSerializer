@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,68 +28,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using ExtendedXmlSerializer.Core.Sprache;
+using ExtendedXmlSerializer.Core.Specifications;
 
 namespace ExtendedXmlSerializer.Core.Sources
 {
-	static class Extensions
+	public static class Extensions
 	{
-		public static IParameterizedSource<TParameter, TTo> To<TParameter, TResult, TTo>(
-			this IParameterizedSource<TParameter, TResult> @this, IParameterizedSource<TResult, TTo> coercer)
-			=> new CoercedResult<TParameter, TResult, TTo>(@this, coercer);
-
-		public static IParameterizedSource<TFrom, TResult> In<TFrom, TTo, TResult>(
-			this IParameterizedSource<TTo, TResult> @this, IParameterizedSource<TFrom, TTo> coercer)
-			=> new CoercedParameter<TFrom, TTo, TResult>(coercer, @this);
-
-		public static Parser<IOption<T>> XOptional<T>(this Parser<T> parser)
-		{
-			if (parser == null) throw new ArgumentNullException(nameof(parser));
-			return i =>
-			       {
-				       var result = parser(i);
-				       if (result.WasSuccessful)
-					       return Result.Success(new Some<T>(result.Value), result.Remainder);
-
-				       if (result.Remainder.Equals(i))
-					       return Result.Success(new None<T>(), i);
-
-				       return Result.Failure<IOption<T>>(result.Remainder, result.Message, result.Expectations);
-			       };
-		}
-
-		public static ImmutableArray<TItem>? GetAny<T, TItem>(this IParameterizedSource<T, ImmutableArray<TItem>> @this,
-		                                                      T parameter)
-		{
-			var items = @this.Get(parameter);
-			var result = items.Any() ? items : (ImmutableArray<TItem>?) null;
-			return result;
-		}
-
-		public static Parser<Tuple<T1, T2>> SelectMany<T1, T2>(this Parser<T1> parser, Parser<T2> instance)
-			=> parser.SelectMany(instance.Accept, Tuple.Create);
-
-		public static Parser<T> Get<T>(this IParsing<T> @this) => @this.Get;
-
-		public static T ParseAsOptional<T>(this Parser<T> @this, string data)
-			=> @this.XOptional()
-			        .Invoke(Inputs.Default.Get(data))
-			        .Value.GetOrDefault();
-
-		public static T Get<T>(this IParsing<T> @this, string parameter) => @this.Get(Inputs.Default.Get(parameter))
-		                                                                         .Value;
-
-		public static Func<IInput, IResult<T>> ToDelegate<T>(this Parser<T> @this)
-			=> new Func<IInput, IResult<T>>(@this);
-
-		public static Parser<T> ToParser<T>(this Func<IInput, IResult<T>> @this) => new Parser<T>(@this);
-
-		public static T TryOrDefault<T>(this Parser<T> @this, string data)
-		{
-			var parse = @this.TryParse(data);
-			var result = parse.WasSuccessful ? parse.Value : default(T);
-			return result;
-		}
+		public static IAlteration<object> Adapt<T>(this IAlteration<T> @this) => new AlterationAdapter<T>(@this);
 
 		public static T Get<T>(this IParameterizedSource<Stream, T> @this, string parameter)
 			=> @this.Get(new MemoryStream(Encoding.UTF8.GetBytes(parameter)));
@@ -100,6 +45,62 @@ namespace ExtendedXmlSerializer.Core.Sources
 		public static T Get<T>(this IParameterizedSource<Type, T> @this, TypeInfo parameter)
 			=> @this.Get(parameter.AsType());
 
+		/*public static T For<T>(this IParameterizedSource<TypeInfo, T> @this, Type parameter)
+			=> @this.Get(parameter.GetTypeInfo());
+
+		public static T For<T>(this IParameterizedSource<Type, T> @this, TypeInfo parameter)
+			=> @this.Get(parameter.AsType());*/
+
+		public static IParameterizedSource<TParameter, TTo> To<TParameter, TResult, TTo>(
+			this IParameterizedSource<TParameter, TResult> @this, IParameterizedSource<TResult, TTo> coercer)
+			=> new CoercedResult<TParameter, TResult, TTo>(@this, coercer);
+
+		public static IParameterizedSource<TFrom, TResult> In<TFrom, TTo, TResult>(
+			this IParameterizedSource<TTo, TResult> @this, IParameterizedSource<TFrom, TTo> coercer)
+			=> new CoercedParameter<TFrom, TTo, TResult>(coercer, @this);
+
+		public static ImmutableArray<TItem>? GetAny<T, TItem>(this IParameterizedSource<T, ImmutableArray<TItem>> @this,
+		                                                      T parameter)
+		{
+			var items = @this.Get(parameter);
+			var result = items.Any() ? items : (ImmutableArray<TItem>?) null;
+			return result;
+		}
+
+		public static IParameterizedSource<TParameter, TResult> If<TParameter, TResult>(
+			this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification)
+			=> new ConditionalSource<TParameter, TResult>(specification, @this,
+			                                              new FixedInstanceSource<TParameter, TResult>(default(TResult)));
+
+		public static IParameterizedSource<TParameter, TResult> If<TParameter, TResult>(
+			this TResult @this, ISpecification<TParameter> specification)
+			=> new ConditionalSource<TParameter, TResult>(specification, new FixedInstanceSource<TParameter, TResult>(@this),
+			                                              new FixedInstanceSource<TParameter, TResult>(default(TResult)));
+
+		public static IParameterizedSource<TParameter, TResult> Let<TParameter, TResult>(
+			this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification,
+			IParameterizedSource<TParameter, TResult> other) =>
+			Let(@this, specification, AlwaysSpecification<TResult>.Default, other);
+
+		public static IParameterizedSource<TParameter, TResult> Let<TParameter, TResult>(
+			this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification,
+			ISpecification<TResult> result,
+			IParameterizedSource<TParameter, TResult> other)
+			=> new ConditionalSource<TParameter, TResult>(specification, result, other, @this);
+
+		public static IParameterizedSource<TParameter, TResult> Let<TParameter, TResult>(
+			this IParameterizedSource<TParameter, TResult> @this, ISpecification<TParameter> specification,
+			TResult other)
+			=> new ConditionalSource<TParameter, TResult>(specification, new FixedInstanceSource<TParameter, TResult>(other),
+			                                              @this);
+
+		public static IParameterizedSource<TSpecification, TInstance> Let<TSpecification, TInstance>(
+			this TInstance @this, ISpecification<TSpecification> specification,
+			TInstance other)
+			=> new ConditionalSource<TSpecification, TInstance>(specification,
+			                                                    new FixedInstanceSource<TSpecification, TInstance>(other),
+			                                                    new FixedInstanceSource<TSpecification, TInstance>(@this));
+
 		public static IParameterizedSource<TParameter, TResult> Or<TParameter, TResult>(
 			this IParameterizedSource<TParameter, TResult> @this, IParameterizedSource<TParameter, TResult> next)
 			where TResult : class => new LinkedDecoratedSource<TParameter, TResult>(@this, next);
@@ -109,11 +110,22 @@ namespace ExtendedXmlSerializer.Core.Sources
 
 		public static Func<TResult> Build<TParameter, TResult>(this IParameterizedSource<TParameter, TResult> @this,
 		                                                       TParameter parameter)
+			=> @this.ToDelegate()
+			        .Build(parameter);
+
+		public static Func<TResult> Build<TParameter, TResult>(this Func<TParameter, TResult> @this,
+		                                                       TParameter parameter)
 			=> @this.Fix(parameter)
 			        .Singleton()
 			        .Get;
 
+
 		public static ISource<TResult> Fix<TParameter, TResult>(this IParameterizedSource<TParameter, TResult> @this,
+		                                                        TParameter parameter)
+			=> @this.ToDelegate()
+			        .Fix(parameter);
+
+		public static ISource<TResult> Fix<TParameter, TResult>(this Func<TParameter, TResult> @this,
 		                                                        TParameter parameter)
 			=> new FixedSource<TParameter, TResult>(@this, parameter);
 

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,14 +32,13 @@ namespace ExtendedXmlSerializer.ExtensionModel.Markup
 	{
 		readonly ImmutableArray<IEvaluation> _candidates;
 
-		public ValidMarkupExtensionConstructor(ImmutableArray<IEvaluation> candidates)
-		{
-			_candidates = candidates;
-		}
+		public ValidMarkupExtensionConstructor(ImmutableArray<IEvaluation> candidates) => _candidates = candidates;
 
 		public bool IsSatisfiedBy(ConstructorInfo parameter)
 		{
-			var parameters = parameter.GetParameters().Select(x => x.ParameterType.GetTypeInfo()).ToArray();
+			var parameters = parameter.GetParameters()
+			                          .Select(x => x.ParameterType.GetTypeInfo())
+			                          .ToArray();
 			var result = parameters.Length == _candidates.Length &&
 			             parameters.Zip(_candidates.ToArray(), (info, evaluation) => evaluation.IsSatisfiedBy(info))
 			                       .All(x => x);

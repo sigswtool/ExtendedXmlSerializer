@@ -1,6 +1,6 @@
 ﻿// MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.References
 {
-	class IsReferenceSpecification : InverseSpecification<TypeInfo>
+	sealed class IsReferenceSpecification : InverseSpecification<TypeInfo>
 	{
 		public static IsReferenceSpecification Default { get; } = new IsReferenceSpecification();
 		IsReferenceSpecification() : base(IsValueTypeSpecification.Default) {}

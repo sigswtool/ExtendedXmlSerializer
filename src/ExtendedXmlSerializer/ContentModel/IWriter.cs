@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,10 +25,7 @@ using ExtendedXmlSerializer.ContentModel.Format;
 
 namespace ExtendedXmlSerializer.ContentModel
 {
-	public interface IWriter
-	{
-		void Write(IFormatWriter writer, object instance);
-	}
+	public interface IWriter : IWriter<object> {}
 
 	public interface IWriter<in T>
 	{

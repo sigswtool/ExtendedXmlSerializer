@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +31,7 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Xml
 {
-	sealed class MemberFormatExtension : ISerializerExtension
+	public sealed class MemberFormatExtension : ISerializerExtension
 	{
 		public MemberFormatExtension()
 			: this(new Dictionary<MemberInfo, IAttributeSpecification>(MemberComparer.Default), new HashSet<MemberInfo>(MemberComparer.Default)) {}

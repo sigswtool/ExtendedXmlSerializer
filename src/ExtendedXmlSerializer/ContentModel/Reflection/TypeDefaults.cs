@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@ namespace ExtendedXmlSerializer.ContentModel.Reflection
 	sealed class TypeDefaults : ReferenceCacheBase<TypeInfo, object>, ITypeDefaults
 	{
 		public static TypeDefaults Default { get; } = new TypeDefaults();
-		TypeDefaults() : this(Activators.Default) {}
+		TypeDefaults() : this(DefaultActivators.Default) {}
 
 		readonly IActivators _activators;
 

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,18 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Immutable;
 using System.Reflection;
-using ExtendedXmlSerializer.ContentModel.Members;
 using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 {
-	sealed class ParameterizedConstructorSpecification :
-		AnySpecification<ConstructorInfo>, IValidConstructorSpecification
+	sealed class ParameterizedConstructorSpecification : AnySpecification<ConstructorInfo>, IValidConstructorSpecification
 	{
 		public ParameterizedConstructorSpecification(IValidConstructorSpecification specification, IConstructorMembers source)
-			: base(specification, new DelegatedAssignedSpecification<ConstructorInfo, ImmutableArray<IMember>?>(source.Get)) {}
+			: base(specification, source.IfAssigned()) {}
 	}
 }

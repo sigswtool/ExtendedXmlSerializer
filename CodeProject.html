@@ -4,7 +4,7 @@
 
 <ul>
 <li>.NET 4.5</li>
-<li>.NET Platform Standard 1.6</li>
+<li>.NET Standard 2.0</li>
 </ul>
 
 <p>Support features:</p>
@@ -17,7 +17,8 @@
 <li>Deserialization of old version of xml</li>
 <li>Property encryption</li>
 <li>Custom serializer</li>
-<li>Support <code>XmlElementAttribute</code> and <code>XmlRootAttribute</code></li>
+<li>Support <code>XmlElementAttribute</code>, <code>XmlRootAttribute</code>, and <code>XmlTypeAttribute</code> for identity resolution.</li>
+<li>Additional attribute support: <code>XmlIgnoreAttribute</code>, <code>XmlAttributeAttribute</code>, and <code>XmlEnumAttribute</code>.</li>
 <li>POCO - all configurations (migrations, custom serializer...) are outside the clas</li>
 </ul>
 
@@ -123,6 +124,8 @@
 <p>Now that your configuration container has been configured and your serializer has been created, it's time to get to the serialization.</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().Create();
     var obj = new TestClass();
     var xml = serializer.Serialize(obj);
@@ -132,6 +135,8 @@
 
 
 <pre lang="cs">
+    
+    
     var obj2 = serializer.Deserialize&lt;TestClass&gt;(xml);
 </pre>
 
@@ -140,17 +145,18 @@
 <p>ExtendedXmlSerializer use fluent API to configuration. Example:</p>
 
 <pre lang="cs">
-    var serializer = new ConfigurationContainer()
-        .UseEncryptionAlgorithm(new CustomEncryption())
-        .Type&lt;Person&gt;() // Configuration of Person class
-            .Member(p =&gt; p.Password) // First member
-                .Name(&quot;P&quot;)
-                .Encrypt()
-            .Member(p =&gt; p.Name) // Second member
-                .Name(&quot;T&quot;)
-        .Type&lt;TestClass&gt;() // Configuration of another class
-            .CustomSerializer(new TestClassSerializer())
-        .Create();
+    
+                var serializer = new ConfigurationContainer()
+                    .UseEncryptionAlgorithm(new CustomEncryption())
+                    .Type&lt;Person&gt;() // Configuration of Person class
+                        .Member(p =&gt; p.Password) // First member
+                            .Name(&quot;P&quot;)
+                            .Encrypt()
+                        .Member(p =&gt; p.Name) // Second member
+                            .Name(&quot;T&quot;)
+                    .Type&lt;TestClass&gt;() // Configuration of another class
+                        .CustomSerializer(new TestClassSerializer())
+                    .Create();
 </pre>
 
 <h2>Serialization of dictionary</h2>
@@ -158,6 +164,7 @@
 <p>You can serialize generic dictionary, that can store any type.</p>
 
 <pre lang="cs">
+    
     public class TestClass
     {
         public Dictionary&lt;int, string&gt; Dictionary { get; set; }
@@ -166,6 +173,7 @@
 
 
 <pre lang="cs">
+    
     var obj = new TestClass
     {
         Dictionary = new Dictionary&lt;int, string&gt;
@@ -226,6 +234,8 @@
 <p>If your class has to be serialized in a non-standard way:</p>
 
 <pre lang="cs">
+    
+    
     public class TestClass
     {
         public TestClass(string paramStr, int paramInt)
@@ -242,6 +252,8 @@
 <p>You must create custom serializer:</p>
 
 <pre lang="cs">
+    
+    
     public class TestClassSerializer : IExtendedXmlCustomSerializer&lt;TestClass&gt;
     {
         public TestClass Deserialize(XElement element)
@@ -269,6 +281,8 @@
 <p>Then, you have to add custom serializer to configuration of TestClass:</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().Type&lt;TestClass&gt;()
                                                  .CustomSerializer(new TestClassSerializer())
                                                  .Create();
@@ -280,16 +294,18 @@
 <p>If you had a class:</p>
 
 <pre lang="cs">
-    public class TestClass
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-    }
+    
+        public class TestClass
+        {
+            public int Id { get; set; }
+            public string Type { get; set; }
+        }
 </pre>
 
 <p>and generated XML look like:</p>
 
 <pre lang="xml">
+    
     &lt;? xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
     &lt;TestClass xmlns=&quot;clr-namespace:ExtendedXmlSerialization.Samples.MigrationMap;assembly=ExtendedXmlSerializer.Samples&quot;&gt;
       &lt;Id&gt;1&lt;/Id&gt;
@@ -300,16 +316,18 @@
 <p>Then you renamed property:</p>
 
 <pre lang="cs">
-    public class TestClass
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    
+        public class TestClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
 </pre>
 
 <p>and generated XML look like:</p>
 
 <pre lang="xml">
+    
     &lt;? xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
     &lt;TestClass xmlns:exs=&quot;https://extendedxmlserializer.github.io/v2&quot; exs:version=&quot;1&quot; xmlns=&quot;clr-namespace:ExtendedXmlSerialization.Samples.MigrationMap;assembly=ExtendedXmlSerializer.Samples&quot;&gt;
       &lt;Id&gt;1&lt;/Id&gt;
@@ -320,6 +338,8 @@
 <p>Then, you added new property and you wanted to calculate a new value during deserialization.</p>
 
 <pre lang="cs">
+    
+    
     public class TestClass
     {
         public int Id { get; set; }
@@ -342,6 +362,8 @@
 <p>You can migrate (read) old version of XML using migrations:</p>
 
 <pre lang="cs">
+    
+    
     public class TestClassMigrations : IEnumerable&lt;Action&lt;XElement&gt;&gt;
     {
         public static void MigrationV0(XElement node)
@@ -372,6 +394,8 @@
 <p>Then, you must register your <code>TestClassMigrations</code> class in configuration</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().ConfigureType&lt;TestClass&gt;()
                                                  .AddMigration(new TestClassMigrations())
                                                  .Create();
@@ -386,6 +410,8 @@
 <p>If you have a class:</p>
 
 <pre lang="cs">
+    
+    
     public class Person
     {
         public int Id { get; set; }
@@ -403,6 +429,8 @@
 <p>then you create object with circular reference, like this:</p>
 
 <pre lang="cs">
+    
+    
     var boss = new Person {Id = 1, Name = &quot;John&quot;};
     boss.Boss = boss; //himself boss
     var worker = new Person {Id = 2, Name = &quot;Oliver&quot;};
@@ -420,6 +448,8 @@
 <p>You must configure Person class as reference object:</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().ConfigureType&lt;Person&gt;()
                                                  .EnableReferences(p =&gt; p.Id)
                                                  .Create();
@@ -449,6 +479,8 @@
 <p>If you have a class with a property that needs to be encrypted:</p>
 
 <pre lang="cs">
+    
+    
     public class Person
     {
         public string Name { get; set; }
@@ -459,6 +491,8 @@
 <p>You must implement interface IEncryption. For example, it will show the Base64 encoding, but in the real world better to use something safer, eg. RSA.:</p>
 
 <pre lang="cs">
+    
+    
     public class CustomEncryption : IEncryption
     {
         public string Parse(string data)
@@ -472,6 +506,8 @@
 <p>Then, you have to specify which properties are to be encrypted and register your IEncryption implementation.</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().UseEncryptionAlgorithm(new CustomEncryption())
                                                  .ConfigureType&lt;Person&gt;()
                                                  .Member(p =&gt; p.Password)
@@ -486,6 +522,8 @@
 <p>Using the following:</p>
 
 <pre lang="cs">
+    
+    
     public sealed class CustomStructConverter : IConverter&lt;CustomStruct&gt;
     {
         public static CustomStructConverter Default { get; } = new CustomStructConverter();
@@ -515,6 +553,7 @@
 <p>Register the converter:</p>
 
 <pre lang="cs">
+    
     var serializer = new ConfigurationContainer().Register(CustomStructConverter.Default).Create();
     var subject = new CustomStruct(123);
     var contents = serializer.Serialize(subject);
@@ -550,6 +589,8 @@
 <p>But with one call to the <code>UseOptimizedNamespaces</code> call, namespaces get placed at the root of the document, thereby reducing document footprint:</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().UseOptimizedNamespaces()
                                                  .Create();
     var subject = new List&lt;object&gt;
@@ -604,6 +645,8 @@
 <p>The default behavior for emitting data in an Xml document is to use elements, which can be a little chatty and verbose:</p>
 
 <pre lang="cs">
+    
+    
     var serializer = new ConfigurationContainer().UseOptimizedNamespaces()
                                                  .Create();
     var subject = new List&lt;object&gt;
@@ -622,7 +665,7 @@
     &lt;SubjectWithThreeProperties xmlns=&quot;clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples&quot;&gt;
       &lt;Number&gt;123&lt;/Number&gt;
       &lt;Message&gt;Hello World!&lt;/Message&gt;
-      &lt;Time&gt;2017-11-21T10:55:38.0990077+01:00&lt;/Time&gt;
+      &lt;Time&gt;2018-01-26T10:27:57.3304845-05:00&lt;/Time&gt;
     &lt;/SubjectWithThreeProperties&gt;
 </pre>
 
@@ -630,7 +673,41 @@
 
 <pre lang="xml">
     &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-    &lt;SubjectWithThreeProperties Number=&quot;123&quot; Message=&quot;Hello World!&quot; Time=&quot;2017-11-21T10:55:38.0990077+01:00&quot; xmlns=&quot;clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples&quot; /&gt;
+    &lt;SubjectWithThreeProperties Number=&quot;123&quot; Message=&quot;Hello World!&quot; Time=&quot;2018-01-26T10:27:57.3304845-05:00&quot; xmlns=&quot;clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples&quot; /&gt;
+</pre>
+
+<h2>Verbatim Content (CDATA)</h2>
+
+<p>If you have an element with a member that can hold lots of data, or data that has illegal characters, you configure it to be a verbatim field and it will emit a CDATA section around it:</p>
+
+<pre lang="cs">
+    
+    var serializer = new ConfigurationContainer().Type&lt;Subject&gt;()
+                                                    .Member(x =&gt; x.Message)
+                                                    .Verbatim()
+                                                    .Create();
+    var subject = new Subject {Message = @&quot;&lt;{&quot;&quot;Ilegal characters and such&quot;&quot;}&gt;&quot;};
+    var contents = serializer.Serialize(subject);
+    // ...
+</pre>
+
+
+<pre lang="xml">
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+    &lt;Subject xmlns=&quot;clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples&quot;&gt;
+      &lt;Message&gt;&lt;![CDATA[&lt;{&quot;Ilegal characters and such&quot;}&gt;]]&gt;&lt;/Message&gt;
+    &lt;/Subject&gt;
+</pre>
+
+<p>You can also denote these fields with an attribute and get the same functionality:</p>
+
+<pre lang="cs">
+    
+    public sealed class VerbatimSubject
+    {
+        [Verbatim]
+        public string Message { get; set; }
+    }
 </pre>
 
 <h2>Private Constructors</h2>
@@ -702,7 +779,7 @@
     &lt;ParameterizedSubject xmlns=&quot;clr-namespace:ExtendedXmlSerializer.Samples.Extensibility;assembly=ExtendedXmlSerializer.Samples&quot;&gt;
       &lt;Message&gt;Hello World!&lt;/Message&gt;
       &lt;Number&gt;123&lt;/Number&gt;
-      &lt;Time&gt;2017-11-21T10:55:38.3180296+01:00&lt;/Time&gt;
+      &lt;Time&gt;2018-01-26T10:27:57.488419-05:00&lt;/Time&gt;
     &lt;/ParameterizedSubject&gt;
 </pre>
 
@@ -823,6 +900,7 @@
 
 
 <pre lang="cs">
+    
     var legacySerializer = new ExtendedXmlSerialization.ExtendedXmlSerializer();
     var content = File.ReadAllText(@&quot;bin\Upgrade.Example.v1.xml&quot;); // Path to your legacy xml file.
     var subject = legacySerializer.Deserialize&lt;List&lt;Subject&gt;&gt;(content);

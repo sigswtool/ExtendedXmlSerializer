@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ExtendedXmlSerializer.DocGenerator.ExportedTypes;
+using System;
 using System.IO;
-using ExtendedXmlSerializer.DocGenerator.ExportedTypes;
 
 namespace ExtendedXmlSerializer.DocGenerator
 {
@@ -22,7 +22,7 @@ namespace ExtendedXmlSerializer.DocGenerator
 			doc.AddHeader("Information");
 
 			doc.Add("Support platforms:");
-			doc.AddList(".NET 4.5", ".NET Platform Standard 1.6");
+			doc.AddList(".NET 4.5", ".NET Standard 2.0");
 			doc.Add("Support features:");
 			doc.AddList(
 				"Deserialization xml from standard `XMLSerializer`",
@@ -32,7 +32,8 @@ namespace ExtendedXmlSerializer.DocGenerator
 				"Deserialization of old version of xml",
 				"Property encryption",
 				"Custom serializer",
-				"Support `XmlElementAttribute` and `XmlRootAttribute`",
+				"Support `XmlElementAttribute`, `XmlRootAttribute`, and `XmlTypeAttribute` for identity resolution.",
+				"Additional attribute support: `XmlIgnoreAttribute`, `XmlAttributeAttribute`, and `XmlEnumAttribute`.",
 				"POCO - all configurations (migrations, custom serializer...) are outside the clas");
 
 			doc.Add("Standard XML Serializer in .NET is very limited:");
@@ -175,6 +176,15 @@ namespace ExtendedXmlSerializer.DocGenerator
 
 			doc.Add("Making use of the `UseAutoFormatting` call will enable all types that have a registered `IConverter` (convert to string and back) to emit as attributes:");
 			doc.AddCode(@"..\..\..\..\samples\ExtendedXmlSerializer.Samples\bin\Extensibility.AutoFormatting.Enabled.xml", CodeFormat.Xml);
+
+			doc.AddHeader("Verbatim Content (CDATA)");
+			doc.Add("If you have an element with a member that can hold lots of data, or data that has illegal characters, you configure it to be a verbatim field and it will emit a CDATA section around it:");
+			doc.AddCode(@"..\..\..\..\samples\ExtendedXmlSerializer.Samples\Extensibility\VerbatimContent.cs", "Example");
+
+			doc.AddCode(@"..\..\..\..\samples\ExtendedXmlSerializer.Samples\bin\Extensibility.VerbatimContent.xml", CodeFormat.Xml);
+
+			doc.Add("You can also denote these fields with an attribute and get the same functionality:");
+			doc.AddCode(@"..\..\..\..\samples\ExtendedXmlSerializer.Samples\Extensibility\VerbatimContent.cs", "Subject");
 
 			doc.AddHeader("Private Constructors");
 			doc.Add("One of the limitations of the classic `XmlSerializer` is that it does not support private constructors, but `ExtendedXmlSerializer` does via its `EnableAllConstructors` call:");

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,5 +26,5 @@ using ExtendedXmlSerializer.Core.Sources;
 
 namespace ExtendedXmlSerializer.ContentModel.Members
 {
-	interface IAllowedMemberValues : IParameterizedSource<MemberInfo, IAllowedValueSpecification> {}
+	public interface IAllowedMemberValues : IParameterizedSource<MemberInfo, IAllowedValueSpecification> {}
 }

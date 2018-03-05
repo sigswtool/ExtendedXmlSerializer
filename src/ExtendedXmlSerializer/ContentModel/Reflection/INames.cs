@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,5 +28,5 @@ namespace ExtendedXmlSerializer.ContentModel.Reflection
 {
 	interface INames : INames<TypeInfo> {}
 
-	interface INames<in T> : IParameterizedSource<T, string> where T : MemberInfo {}
+	public interface INames<in T> : IParameterizedSource<T, string> where T : MemberInfo {}
 }

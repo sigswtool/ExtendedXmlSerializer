@@ -1,6 +1,6 @@
 ﻿// MIT License
 //
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,14 +23,17 @@
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace ExtendedXmlSerializer.Core.Sources
 {
-	class Items<T> : ItemsBase<T>
+	public class Items<T> : ItemsBase<T>
 	{
 		readonly ImmutableArray<T> _items;
 
-		public Items(params T[] items) : this(items.ToImmutableArray()) {}
+		public Items(params T[] items) : this(items.AsEnumerable()) {}
+
+		public Items(IEnumerable<T> items) : this(items.ToImmutableArray()) {}
 
 		public Items(ImmutableArray<T> items) => _items = items;
 

@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@
 
 using System.Collections.Generic;
 using ExtendedXmlSerializer.Core;
-using ExtendedXmlSerializer.Core.Sources;
+using ExtendedXmlSerializer.Core.Parsing;
 using ExtendedXmlSerializer.Core.Sprache;
 using ExtendedXmlSerializer.ExtensionModel.Expressions;
 
@@ -35,7 +35,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Markup
 			: this(CodeIdentifier.Default, delimiter, expression) {}
 
 		public Property(Parser<string> name, CharacterParser delimiter, Parser<IExpression> expression)
-			: this(name, delimiter.Get().Token(), expression) {}
+			: this(name, delimiter.ToParser().Token(), expression) {}
 
 		public Property(Parser<string> name, Parser<char> delimiter, Parser<IExpression> expression) : base(
 			name.SelectMany(delimiter.Accept, (s, _) => s)

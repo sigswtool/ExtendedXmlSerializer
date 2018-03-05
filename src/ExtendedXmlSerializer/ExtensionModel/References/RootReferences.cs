@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2016 Wojciech Nagórski
+// Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,29 +23,20 @@
 
 using System.Collections.Immutable;
 using ExtendedXmlSerializer.ContentModel.Format;
-using ExtendedXmlSerializer.ContentModel.Members;
-using ExtendedXmlSerializer.Core.Sources;
-using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.References
 {
-	sealed class RootReferences : StructureCacheBase<IFormatWriter, ImmutableArray<object>>, IRootReferences
+	sealed class RootReferences : IRootReferences
 	{
-		readonly IReferencesPolicy _policy;
-		readonly ITypeMembers _members;
-		readonly IEnumeratorStore _enumerators;
-		readonly IMemberAccessors _accessors;
+		readonly IReferences _references;
+		readonly IRootInstances _root;
 
-		public RootReferences(IReferencesPolicy policy, ITypeMembers members, IEnumeratorStore enumerators,
-		                      IMemberAccessors accessors)
+		public RootReferences(IReferences references, IRootInstances root)
 		{
-			_policy = policy;
-			_members = members;
-			_enumerators = enumerators;
-			_accessors = accessors;
+			_references = references;
+			_root = root;
 		}
 
-		protected override ImmutableArray<object> Create(IFormatWriter parameter)
-			=> new ReferenceWalker(_policy, _members, _enumerators, _accessors, parameter.Instance).Get();
+		public ImmutableArray<object> Get(IFormatWriter parameter) => _references.Get(_root.Get(parameter.Get()));
 	}
 }
