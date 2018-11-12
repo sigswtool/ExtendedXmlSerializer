@@ -33,17 +33,17 @@ namespace ExtendedXmlSerializer.ContentModel.Content
 	sealed class VariableTypeIdentity : IWriter
 	{
 		readonly ISpecification<Type> _specification;
-		readonly IWriter<object> _start;
-		readonly IIdentities _identities;
+		readonly IWriter<object>      _start;
+		readonly RuntimeElement       _runtime;
 
-		public VariableTypeIdentity(Type definition, IIdentity identity, IIdentities identities)
-			: this(new VariableTypeSpecification(definition), new Identity<object>(identity), identities) {}
+		public VariableTypeIdentity(Type definition, IIdentity identity, RuntimeElement runtime)
+			: this(VariableTypeSpecification.Defaults.Get(definition), new Identity<object>(identity), runtime) {}
 
-		public VariableTypeIdentity(ISpecification<Type> specification, IWriter<object> start, IIdentities identities)
+		public VariableTypeIdentity(ISpecification<Type> specification, IWriter<object> start, RuntimeElement runtime)
 		{
 			_specification = specification;
-			_start = start;
-			_identities = identities;
+			_start         = start;
+			_runtime       = runtime;
 		}
 
 		public void Write(IFormatWriter writer, object instance)
@@ -51,7 +51,8 @@ namespace ExtendedXmlSerializer.ContentModel.Content
 			var type = instance.GetType();
 			if (_specification.IsSatisfiedBy(type))
 			{
-				writer.Start(_identities.Get(type.GetTypeInfo()));
+				_runtime.Get(type.GetTypeInfo())
+				        .Write(writer, instance);
 			}
 			else
 			{

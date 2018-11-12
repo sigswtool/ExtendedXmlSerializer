@@ -21,30 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using ExtendedXmlSerializer.ContentModel.Collections;
 using ExtendedXmlSerializer.Core.Specifications;
 using System.Collections;
 
 namespace ExtendedXmlSerializer.ContentModel.Members
 {
-	class ReadOnlyCollectionMemberAccess : DecoratedSpecification<object>, IMemberAccess
+	sealed class ReadOnlyCollectionMemberAccess : IMemberAccess
 	{
 		readonly IMemberAccess _access;
 
-		public ReadOnlyCollectionMemberAccess(IMemberAccess access) : base(access) => _access = access;
+		public ReadOnlyCollectionMemberAccess(IMemberAccess access) => _access = access;
 
-		public object Get(object instance)
-		{
-			var current = _access.Get(instance);
-			var list = Lists.Default.Get(current);
-			var result = list.Count > 0 ? current : null;
-			return result;
-		}
+		public ISpecification<object> Instance => _access.Instance;
+
+		public bool IsSatisfiedBy(object parameter) => _access.IsSatisfiedBy(parameter);
+
+		public object Get(object instance) => _access.Get(instance);
 
 		public void Assign(object instance, object value)
 		{
 			var collection = _access.Get(instance);
-			foreach (var element in (IEnumerable) value)
+			foreach (var element in (IEnumerable)value)
 			{
 				_access.Assign(collection, element);
 			}

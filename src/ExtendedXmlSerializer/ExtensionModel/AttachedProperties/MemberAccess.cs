@@ -28,13 +28,18 @@ namespace ExtendedXmlSerializer.ExtensionModel.AttachedProperties
 {
 	sealed class MemberAccess : IMemberAccess
 	{
+		public ISpecification<object> Instance { get; }
 		readonly ISpecification<object> _specification;
-		readonly IProperty _property;
+		readonly IProperty              _property;
 
 		public MemberAccess(ISpecification<object> specification, IProperty property)
+			: this(specification, specification.GetInstance(), property) {}
+
+		public MemberAccess(ISpecification<object> specification, ISpecification<object> instance, IProperty property)
 		{
+			Instance       = instance;
 			_specification = specification;
-			_property = property;
+			_property      = property;
 		}
 
 		public bool IsSatisfiedBy(object parameter) => _specification.IsSatisfiedBy(parameter);

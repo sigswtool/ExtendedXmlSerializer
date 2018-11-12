@@ -1,18 +1,18 @@
 ﻿// MIT License
-// 
+//
 // Copyright (c) 2016-2018 Wojciech Nagórski
 //                    Michael DeMond
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,6 +29,7 @@ using ExtendedXmlSerializer.Core;
 using ExtendedXmlSerializer.Core.Sources;
 using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ExtensionModel.Content.Members;
+using ExtendedXmlSerializer.ExtensionModel.Xml;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -59,6 +60,24 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content
 		public static IConfigurationContainer Emit(this IConfigurationContainer @this, IEmitBehavior behavior) =>
 			behavior.Get(@this);
 
+		public static IMemberConfiguration<T, TMember> EmitWhen<T, TMember>(this IMemberConfiguration<T, TMember> @this,
+		                                                                    Func<TMember, bool> specification)
+		{
+			@this.Root.Find<AllowedMemberValuesExtension>()
+			     .Specifications[@this.GetMember()] =
+				new AllowedValueSpecification(new DelegatedSpecification<TMember>(specification).AdaptForNull());
+			return @this;
+		}
+
+		public static IMemberConfiguration<T, TMember> EmitWhenInstance<T, TMember>(
+			this IMemberConfiguration<T, TMember> @this,
+			Func<T, bool> specification)
+		{
+			@this.Root.Find<AllowedMemberValuesExtension>()
+			     .Instances[@this.GetMember()] = new DelegatedSpecification<T>(specification).AdaptForNull();
+			return @this;
+		}
+
 		public static ITypeConfiguration<T> EmitWhen<T>(this ITypeConfiguration<T> @this,
 		                                                Func<T, bool> specification)
 		{
@@ -68,40 +87,31 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content
 			return @this;
 		}
 
-		public static IMemberConfiguration<T, TMember> EmitWhen<T, TMember>(this IMemberConfiguration<T, TMember> @this,
-		                                                                    Func<TMember, bool> specification)
-		{
-			@this.Root.Find<AllowedMemberValuesExtension>()
-			     .Specifications[((ISource<MemberInfo>) @this).Get()] =
-				new AllowedValueSpecification(new DelegatedSpecification<TMember>(specification).AdaptForNull());
-			return @this;
-		}
-
 		public static IMemberConfiguration<T, TMember> Ignore<T, TMember>(this IMemberConfiguration<T, TMember> @this)
 		{
 			@this.Root.With<AllowedMembersExtension>()
-			     .Blacklist.Add(((ISource<MemberInfo>) @this).Get());
+			     .Blacklist.Add(((ISource<MemberInfo>)@this).Get());
 			return @this;
 		}
 
 		public static IConfigurationContainer Ignore(this IConfigurationContainer @this, MemberInfo member)
 		{
 			@this.Root.With<AllowedMembersExtension>()
-				.Blacklist.Add(member);
+			     .Blacklist.Add(member);
 			return @this;
 		}
 
 		public static IMemberConfiguration<T, TMember> Include<T, TMember>(this IMemberConfiguration<T, TMember> @this)
 		{
 			@this.Root.With<AllowedMembersExtension>()
-			     .Whitelist.Add(((ISource<MemberInfo>) @this).Get());
+			     .Whitelist.Add(((ISource<MemberInfo>)@this).Get());
 			return @this;
 		}
 
 		internal static IMemberConfiguration Include(this IMemberConfiguration @this)
 		{
 			@this.Root.With<AllowedMembersExtension>()
-			     .Whitelist.Add(((ISource<MemberInfo>) @this).Get());
+			     .Whitelist.Add(((ISource<MemberInfo>)@this).Get());
 			return @this;
 		}
 
@@ -117,7 +127,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content
 
 		public static ITypeConfiguration<T> OnlyConfiguredProperties<T>(this ITypeConfiguration<T> @this)
 		{
-			foreach (var member in (IEnumerable<IMemberConfiguration>) @this)
+			foreach (var member in (IEnumerable<IMemberConfiguration>)@this)
 			{
 				member.Include();
 			}
@@ -142,6 +152,10 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content
 		                                                         IAlteration<IConverter> optimizations)
 			=> @this.Alter(optimizations);
 
+		public static IConfigurationContainer Register<T>(this IConfigurationContainer @this, Func<T, string> format,
+		                                                  Func<string, T> parse)
+			=> @this.Register<T>(new Converter<T>(parse, format));
+
 		public static IConfigurationContainer Register<T>(this IConfigurationContainer @this, IConverter<T> converter)
 		{
 			var item = converter as Converter<T> ?? Converters<T>.Default.Get(converter);
@@ -158,6 +172,7 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content
 		sealed class Converters<T> : ReferenceCache<IConverter<T>, IConverter<T>>
 		{
 			public static Converters<T> Default { get; } = new Converters<T>();
+
 			Converters() : base(key => new Converter<T>(key, key.Parse, key.Format)) {}
 		}
 	}

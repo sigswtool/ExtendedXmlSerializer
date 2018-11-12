@@ -21,28 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using ExtendedXmlSerializer.ContentModel.Members;
 using ExtendedXmlSerializer.Core.Specifications;
 using ExtendedXmlSerializer.ExtensionModel.Types;
 using ExtendedXmlSerializer.ReflectionModel;
-using System;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 {
 	sealed class ParameterizedMemberAccessors : IMemberAccessors
 	{
 		readonly IAllowedMemberValues _allow;
-		readonly IMemberAccessors _accessors;
-		readonly IGetterFactory _getter;
+		readonly IMemberAccessors     _accessors;
+		readonly IGetterFactory       _getter;
 
 		public ParameterizedMemberAccessors(IAllowedMemberValues allow, IMemberAccessors accessors)
 			: this(allow, accessors, GetterFactory.Default) {}
 
 		public ParameterizedMemberAccessors(IAllowedMemberValues allow, IMemberAccessors accessors, IGetterFactory getter)
 		{
-			_allow = allow;
+			_allow     = allow;
 			_accessors = accessors;
-			_getter = getter;
+			_getter    = getter;
 		}
 
 		public IMemberAccess Get(IMember parameter)
@@ -61,15 +61,17 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 		sealed class ActivatedMemberAccess : IMemberAccess
 		{
 			readonly IMemberAccess _member;
-			readonly string _name;
+			readonly string        _name;
 
 			public ActivatedMemberAccess(IMemberAccess member, string name)
 			{
 				_member = member;
-				_name = name;
+				_name   = name;
 			}
 
 			public bool IsSatisfiedBy(object parameter) => _member.IsSatisfiedBy(parameter);
+
+			public ISpecification<object> Instance => _member.Instance;
 
 			public object Get(object instance) => (instance as IActivationContext)?.Get(_name) ?? _member.Get(instance);
 
@@ -88,15 +90,21 @@ namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 
 		sealed class MemberAccess : IMemberAccess
 		{
+			public ISpecification<object> Instance { get; }
 			readonly ISpecification<object> _specification;
-			readonly Func<object, object> _get;
-			readonly string _name;
+			readonly Func<object, object>   _get;
+			readonly string                 _name;
 
 			public MemberAccess(ISpecification<object> specification, Func<object, object> get, string name)
+				: this(specification, specification.GetInstance(), get, name) {}
+
+			public MemberAccess(ISpecification<object> specification, ISpecification<object> instance, Func<object, object> get,
+			                    string name)
 			{
+				Instance       = instance;
 				_specification = specification;
-				_get = get;
-				_name = name;
+				_get           = get;
+				_name          = name;
 			}
 
 			public bool IsSatisfiedBy(object parameter) => _specification.IsSatisfiedBy(parameter);

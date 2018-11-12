@@ -27,9 +27,11 @@ using ExtendedXmlSerializer.ReflectionModel;
 
 namespace ExtendedXmlSerializer.ExtensionModel.Content.Members
 {
-	sealed class ParameterizedConstructorSpecification : AnySpecification<ConstructorInfo>, IValidConstructorSpecification
+	sealed class ParameterizedConstructorSpecification
+		: AnySpecification<ConstructorInfo>, IValidConstructorSpecification
 	{
-		public ParameterizedConstructorSpecification(IValidConstructorSpecification specification, IConstructorMembers source)
+		public ParameterizedConstructorSpecification(IValidConstructorSpecification specification,
+		                                             IConstructorMembers source)
 			: base(specification, source.IfAssigned()) {}
 	}
 }
